@@ -1,0 +1,100 @@
+<script type="text/javascript">
+    $(function () {
+        var importFiles = $("#import-files");
+        var msg = $("#order-form-message");
+        $("#upload-form").submit(function (event) {
+            $('#files').text('');
+            var messages = {
+                "type": "danger",
+                "message": ""
+            };
+            var valid = true;
+            if (importFiles.prop("value") == "") {
+                valid = false;
+                messages['message'] = "Select file to upload!";
+            }
+            msg.removeClass(function (index, className) {
+                return (className.match(/(^|\s)alert-\S+/g) || []).join(' ');
+            });
+            msg.addClass("alert-" + messages['type']);
+            if (valid) {
+                messages['message'] = "<img src='<?php echo $this->url->getStatic('backend/images/waiting.gif'); ?>' alt='Processing...' />Please be patient while our system is processing!";
+            } else {
+                event.preventDefault();
+            }
+            msg.html(messages['message']);
+            msg.show();
+        });
+    });
+</script>
+
+<main class="main-content header-has-action">
+    <div class="container-fluid">
+        <div class="row">
+            <?php $this->partial('shared/content'); ?>
+            <div class="col-lg-10">
+                <div class="dashboard-table">
+                    <h3>Import File</h3>
+                    <hr>
+                    <div id="order-form-message"
+                         class="alert <?php echo isset($messages['type']) ? "alert-" . $messages['type'] : ""; ?>"
+                         style="display:<?php echo isset($messages) ? "block" : "none" ?>; ">
+                        <?php echo isset($messages['message']) ? $messages['message'] : ""; ?>
+                    </div>
+                    <form class="form-horizontal" id="upload-form" enctype="multipart/form-data"
+                          action="<?php echo $this->url->get("import"); ?>" method="post"   >
+                        <div class="form-group row">
+                            <label class="col-lg-2 d-flex justify-content-lg-end align-items-start mb-lg-0">Import Files
+                                <span class="text-danger ml-1">*</span></label>
+                            <div class="col-lg-10">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <input id="import-files" name="import-files[]" type="file" class="custom-file-upload"
+                                               accept="" multiple="multiple"/>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <button type="submit" class="btn btn-outline-primary">Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php
+                        if (!empty($importFiles)) {
+                            ?>
+                            <div id="files">
+                                <?php
+                                foreach ($importFiles as $file) {
+                                    ?>
+                                    <div  class="alert alert-success"  >
+                                        <?php
+                                        if (isset($this->globalVariable->contentTypeImages[$file['file_type']])) {
+                                            ?>
+                                            <img src="<?php echo $file['file_url']; ?>" width="40" height="30"/>
+                                            <?php
+                                        } else {
+                                            ?>
+                                            <img src="<?php echo $this->url->getStatic('backend/images/icon-file.png') ?>"
+                                                 width="40" height="30"/>
+                                            <?php
+                                        }
+                                        ?>
+                                        <a href="<?php echo $file['file_url']; ?>" target="_blank">
+                                            <?php echo $file['file_url']; ?>
+                                        </a>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
